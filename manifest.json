@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Better Portal",
+  "version": "1.0.0",
+  "description": "Improvements to Geffen Academy Portal",
+  "content_scripts": [
+    {
+      "matches": ["https://geffenacademy.myschoolapp.com/*"],
+      "js": ["betterPortal.js"],
+      "all_frames": true
+    }
+  ],
+  "permissions": ["activeTab"]
+}
