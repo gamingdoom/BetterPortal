@@ -3,11 +3,10 @@
 // @namespace    http://danplayz.com/
 // @version      0.1
 // @description  Better Management!
-// @author       DanPlayz
+// @author       DanPlayz, Cat2048
 // @match        https://geffenacademy.myschoolapp.com/app/student
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=myschoolapp.com
 // @grant        none
-// @link         https://github.com/DanPlayz0/BetterPortal
 // ==/UserScript==
 
 (async function() {
@@ -70,6 +69,11 @@
                     }
                 }
             }, 50);
+
+            var clickEvent = document.createEvent("MouseEvents");
+            clickEvent.initEvent("click", true, true);
+            document.querySelector(`[data-sort="date_due"]`).dispatchEvent(clickEvent);
+
             events.push(['click', (e) => {
                 if(e.srcElement.className.includes("betterportal-hide-assignment")) {
                     hiddenAssignments.push({id:e.srcElement.parentElement.parentElement.children[5].children[0].children[0].children[0].dataset.id})
