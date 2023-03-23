@@ -57,6 +57,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
             pageUpdate = setInterval(() => {
                 const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
                 for (let elm of assignments) {
+                    if(elm.children[1].innerText == "My tasks") continue;
                     let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
                         [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
 
