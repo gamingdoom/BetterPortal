@@ -75,7 +75,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
                     // Adds a button to hide the assignment
                     if (!elm.children[6].innerHTML.includes("betterportal-hide-assignment")) {
                         if (elm.children[6].innerText == "Submit") elm.children[6].innerHTML += `<br/>`;
-                        elm.children[6].innerHTML += `${elm.children[6].innerHTML.includes("hide-assignment") ? '<br/>' : ''}<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
+                        elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
                     }
 
                     // Make 
