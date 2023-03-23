@@ -70,6 +70,7 @@
         if (lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
             await waitForElm("tbody#assignment-center-assignment-items>tr");
             let hiddenAssignments = JSON.parse(window.localStorage.getItem('betterportal-hidden-assignments') ?? "[]");
+            let pinnedAssignments = JSON.parse(window.localStorage.getItem('betterportal-pinned-assignments') ?? "[]");
             pageUpdate = setInterval(() => {
                 const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
                 for (let elm of assignments) {
@@ -93,6 +94,13 @@
                     if (!elm.children[6].innerHTML.includes("betterportal-hide-assignment")) {
                         if (elm.children[6].innerText == "Submit") elm.children[6].innerHTML += `<br/>`;
                         elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
+                    }
+
+                    // Pin Assignment (Button)
+                    if (!elm.children[6].innerHTML.includes("betterportal-pin-assignment") && !elm.children[6].innerHTML.includes("betterportal-unpin-assignment")) {
+                        let isPinned = pinnedAssignments.some(x=>x.id == assignmentId);
+                        if (isPinned) elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-unpin-assignment" style="margin-left:10px;">Unpin</button>`;
+                        else elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-pin-assignment" style="margin-left:10px;">Pin</button>`;
                     }
 
                     // Has Saved Notes
@@ -123,7 +131,7 @@
 
             events.push(['click', (e) => {
                 if (e.srcElement.className.includes("betterportal-hide-assignment")) {
-                    hiddenAssignments.push(e.srcElement.parentElement.parentElement.children[5].children[0].children[0].children[0].dataset.id);
+                    hiddenAssignments.push(e.srcElement.dataset.id);
                     e.srcElement.parentElement.parentElement.remove();
                     window.localStorage.setItem("betterportal-hidden-assignments", JSON.stringify(hiddenAssignments))
                     if (!document.querySelector("#betterportal-unhide-all")) {
@@ -134,6 +142,20 @@
                     localStorage.removeItem("betterportal-hidden-assignments");
                     document.querySelector("#betterportal-unhide-all")?.remove();
                     window.location.reload(); // Todo, Make this not reload the page.
+                } else if (e.srcElement.className.includes("betterportal-pin-assignment")) {
+                    let assignmentElm = e.srcElement.parentElement.parentElement;
+                    assignmentElm.children[6].innerHTML = assignmentElm.children[6].innerHTML.replace("betterportal-pin-assignment", "betterportal-unpin-assignment").replace("Pin", "Unpin");
+                    pinnedAssignments.push({
+                        id: e.srcElement.dataset.id,
+                        link: assignmentElm.children[2].children[0].href,
+                    });
+                    window.localStorage.setItem("betterportal-pinned-assignments", JSON.stringify(pinnedAssignments));
+                } else if (e.srcElement.className.includes("betterportal-unpin-assignment")) {
+                    let assignmentElm = e.srcElement.parentElement.parentElement;
+                    assignmentElm.children[6].innerHTML = assignmentElm.children[6].innerHTML.replace("betterportal-unpin-assignment", "betterportal-pin-assignment").replace("Unpin", "Pin");
+                    pinnedAssignments = pinnedAssignments.filter(x=> x.id != e.srcElement.dataset.id);
+                    if (pinnedAssignments.length == 0) localStorage.removeItem("betterportal-pinned-assignments");
+                    else window.localStorage.setItem("betterportal-pinned-assignments", JSON.stringify(pinnedAssignments));
                 }
             }]);
             const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
