@@ -66,7 +66,7 @@
             return value;
         },
         get(key, defaultValue = null) {
-            return localStorage.getItem(key) ?? defaultValue;
+            return JSON.parse(localStorage.getItem(key)) ?? defaultValue;
         },
         remove(key) {
             localStorage.removeItem(key);
