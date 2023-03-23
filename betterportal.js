@@ -62,7 +62,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
                         [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
 
                     // If assignment is hidden, remove it from the list
-                    if (hiddenAssignments.some((x) => x.id == assignmentId)) {
+                    if (hiddenAssignments.includes(assignmentId)) {
                         elm.remove();
                         continue;
                     }
@@ -109,7 +109,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
             events.push(['click', (e) => {
                 if (e.srcElement.className.includes("betterportal-hide-assignment")) {
-                    hiddenAssignments.push({ id: e.srcElement.parentElement.parentElement.children[5].children[0].children[0].children[0].dataset.id })
+                    hiddenAssignments.push(e.srcElement.parentElement.parentElement.children[5].children[0].children[0].children[0].dataset.id);
                     e.srcElement.parentElement.parentElement.remove();
                     window.localStorage.setItem("betterportal-hidden-assignments", JSON.stringify(hiddenAssignments))
                     if (!document.querySelector("#betterportal-unhide-all")) {
