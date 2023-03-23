@@ -48,7 +48,7 @@
             const settings = {
                 "sortby": "date_due", // none, groupname, assignment_type, short_description, date_assigned, date_due, assignment_status
                 "sortdir": "asc", // asc, des
-                
+
             }
             return settings[key];
         }
@@ -57,7 +57,7 @@
                 resolve(items[key]);
             });
         });
-    }; 
+    };
     let $data = {};
     let bpData = {
         set(key, value) {
@@ -84,8 +84,8 @@
 
         if (lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
             await waitForElm("tbody#assignment-center-assignment-items>tr");
-            let hiddenAssignments = bpData.get("hidden-assignments", []);
-            let pinnedAssignments = bpData.get("hidden-assignments", []);
+            let hiddenAssignments = bpData.get("betterportal-hidden-assignments", []);
+            let pinnedAssignments = bpData.get("betterportal-pinned-assignments", []);
             pageUpdate = setInterval(() => {
                 const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
                 for (let elm of assignments) {
