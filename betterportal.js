@@ -61,7 +61,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
                     let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
                         [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
 
-                    // If assignment is hidden, remove it from the list
+                    // Hide Assignment (Function)
                     if (hiddenAssignments.includes(assignmentId)) {
                         elm.remove();
                         continue;
