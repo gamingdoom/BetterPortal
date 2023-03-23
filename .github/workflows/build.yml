@@ -19,6 +19,9 @@ jobs:
     
     - name: Install Build Dependencies
       run: npm install -g web-ext
+      
+    - name: Build Number
+      run: sed "s/BUILDNUM/$(date +%s)/g" -i manifest.json
     
     - name: Build Extension
       run: web-ext build
