@@ -21,7 +21,6 @@
     }
     let lastPagePath = null, lastPageHash = null;
     let pageUpdate = null, events = [];
-    const portalContext = await fetch(`https://geffenacademy.myschoolapp.com/api/webapp/context?_=${Date.now()}`).then(res=>res.json());
     let getSetting = (key) => {
       return new Promise((resolve, reject) => {
           chrome.storage.sync.get(key, (items) => {
@@ -29,6 +28,7 @@
           });
       });
     };
+    let portalContext = null;
     setInterval(async () => {
         if (lastPagePath == window.location.pathname && lastPageHash == window.location.hash) return;
         lastPagePath = window.location.pathname;
@@ -36,6 +36,7 @@
         clearInterval(pageUpdate);
         events.map((x)=> document.body.removeEventListener(x[0], x[1]));
         events = [];
+        if (lastPagePath != "/app" && lastPageHash != "#login") portalContext = await fetch(`https://geffenacademy.myschoolapp.com/api/webapp/context?_=${Date.now()}`).then(res=>res.json()); 
 
         if(lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
             await waitForElm("tbody#assignment-center-assignment-items>tr");
