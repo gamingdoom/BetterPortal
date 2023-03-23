@@ -134,7 +134,6 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 </div>`;
             }
             document.querySelector("#betterportal-text-content textarea").value = localStorage.getItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`) ?? "";
-            let currentAssignmentText = localStorage.getItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`) ?? "";
             events.push(['input', (e) => {
                 if (e.srcElement.id == "betterportal-savedinfo") {
                     if (e.srcElement.value.length == 0) localStorage.removeItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
