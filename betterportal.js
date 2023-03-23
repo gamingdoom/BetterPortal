@@ -31,19 +31,20 @@
         });
     }
     const delay = (ms) => new Promise(res => setTimeout(res, ms));
-    
+
     // Speed up logins
     var landingPage = "assignment-center";
-    if (window.location == "https://geffenacademy.myschoolapp.com/app#login" || window.location == "https://geffenacademy.myschoolapp.com/app/student#login"){
+    if (window.location == "https://geffenacademy.myschoolapp.com/app#login" || window.location == "https://geffenacademy.myschoolapp.com/app/student#login") {
         // Wait until box with username pops up
         await delay(3000);
-        if (document.getElementById("Username").value != ""){
+        if (document.getElementById("Username").value != "") {
             window.location.replace("https://signin.blackbaud.com/signin/?redirectUrl=https:%2F%2Fgeffenacademy.myschoolapp.com%2Fapp%3Fbb_id%3D1%23studentmyday/" + landingPage);
         }
     }
 
     let lastPagePath = null, lastPageHash = null;
     let pageUpdate = null, events = [];
+    let portalContext = null;
     let getSetting = (key) => {
         return new Promise((resolve, reject) => {
             chrome.storage.sync.get(key, (items) => {
@@ -51,7 +52,6 @@
             });
         });
     };
-    let portalContext = null;
     setInterval(async () => {
         if (lastPagePath == window.location.pathname && lastPageHash == window.location.hash) return;
         lastPagePath = window.location.pathname;
@@ -67,7 +67,7 @@
             pageUpdate = setInterval(() => {
                 const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
                 for (let elm of assignments) {
-                    if(elm.children[1].innerText == "My tasks") continue;
+                    if (elm.children[1].innerText == "My tasks") continue;
                     let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
                         [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
 
