@@ -30,6 +30,7 @@ jobs:
       run: web-ext sign --api-key ${{ secrets.key }} --api-secret ${{ secrets.secret }}
       
     - name: Upload a Build Artifact
+      if: always()
       uses: actions/upload-artifact@v3.1.2
       with:
         # Artifact name
