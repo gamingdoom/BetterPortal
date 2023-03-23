@@ -26,7 +26,7 @@
     }
   },
 
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["storage"],
   "action": {
     "default_title": "Better Portal",
     "default_popup": "./html/options.html"
