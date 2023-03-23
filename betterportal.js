@@ -22,7 +22,13 @@
     let lastPagePath = null, lastPageHash = null;
     let pageUpdate = null, events = [];
     const portalContext = await fetch(`https://geffenacademy.myschoolapp.com/api/webapp/context?_=${Date.now()}`).then(res=>res.json());
-    console.log(portalContext);
+    let getSetting = (key) => {
+      return new Promise((resolve, reject) => {
+          chrome.storage.sync.get(key, (items) => {
+              resolve(items[key]);
+          });
+      });
+    };
     setInterval(async () => {
         if (lastPagePath == window.location.pathname && lastPageHash == window.location.hash) return;
         lastPagePath = window.location.pathname;
@@ -68,9 +74,11 @@
                 }
             }, 50);
 
-            var clickEvent = document.createEvent("MouseEvents");
-            clickEvent.initEvent("click", true, true);
-            document.querySelector(`[data-sort="date_due"]`).dispatchEvent(clickEvent);
+            if ((await getSetting("sortby")) != "none") {
+              var clickEvent = document.createEvent("MouseEvents");
+              clickEvent.initEvent("click", true, true);
+              document.querySelector(`[data-sort="${await getSetting("sortby")}"]`).dispatchEvent(clickEvent);
+            }
 
             const assignmentHeaderViewAdd = (prepend = true, html) => {
                 if(!html) throw Error("No HTML Provided! (assignmentHeaderViewAdd)");

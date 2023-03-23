@@ -3,6 +3,13 @@
   "name": "Better Portal",
   "version": "1.0.0",
   "description": "Improvements to Geffen Academy Portal",
+  "icons": {
+    "16": "./img/icon.png",
+    "32": "./img/icon.png",
+    "48": "./img/icon.png",
+    "128": "./img/icon.png",
+    "512": "./img/icon.png"
+  },
   "content_scripts": [
     {
       "matches": ["https://geffenacademy.myschoolapp.com/*"],
@@ -10,5 +17,9 @@
       "all_frames": true
     }
   ],
-  "permissions": ["activeTab"]
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_title": "Better Portal",
+    "default_popup": "./html/options.html"
+  }
 }
