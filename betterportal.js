@@ -67,21 +67,19 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
                         continue;
                     }
 
-                    // Removes the red color for "Overdue" status
+                    // No "Overdue" Red
                     if (elm.children[5].innerText.includes("Overdue") && !elm.children[5].children[0].children[0].children[0].className.includes('betterportal-no-danger')) {
                         elm.children[5].children[0].children[0].children[0].classList.add('betterportal-no-danger');
                         elm.children[5].children[0].children[0].children[0].classList.remove('label-danger');
                     }
 
-                    // Adds a button to hide the assignment
+                    // Hide Assignment (Button)
                     if (!elm.children[6].innerHTML.includes("betterportal-hide-assignment")) {
                         if (elm.children[6].innerText == "Submit") elm.children[6].innerHTML += `<br/>`;
                         elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
                     }
 
-                    // Make 
-
-                    // Shows if there are saved notes for the assignment
+                    // Has Saved Notes
                     const assignmentNotes = localStorage.getItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
                     if (assignmentNotes && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
                         elm.children[2].innerHTML += `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`
