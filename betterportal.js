@@ -30,15 +30,13 @@
             });
         });
     }
-    const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
     // Speed up logins
-    var landingPage = "assignment-center";
     if (window.location == "https://geffenacademy.myschoolapp.com/app#login" || window.location == "https://geffenacademy.myschoolapp.com/app/student#login") {
-        // Wait until box with username pops up
-        await delay(3000);
+        await waitForElm("#Username");
+        await new Promise(resolve => setTimeout(resolve, 3000));
         if (document.getElementById("Username").value != "") {
-            window.location.replace("https://signin.blackbaud.com/signin/?redirectUrl=https:%2F%2Fgeffenacademy.myschoolapp.com%2Fapp%3Fbb_id%3D1%23studentmyday/" + landingPage);
+            window.location.replace("https://signin.blackbaud.com/signin/?redirectUrl=https:%2F%2Fgeffenacademy.myschoolapp.com%2Fapp%3Fbb_id%3D1%23login&login_hint=betterportal@geffenacademy.ucla.edu");
         }
     }
 
@@ -98,10 +96,16 @@
 
                     // Pin Assignment (Button)
                     if (!elm.children[6].innerHTML.includes("betterportal-pin-assignment") && !elm.children[6].innerHTML.includes("betterportal-unpin-assignment")) {
-                        let isPinned = pinnedAssignments.some(x=>x.id == assignmentId);
+                        let isPinned = pinnedAssignments.some(x => x.id == assignmentId);
                         if (isPinned) elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-unpin-assignment" style="margin-left:10px;">Unpin</button>`;
                         else elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-pin-assignment" style="margin-left:10px;">Pin</button>`;
                     }
+
+                    // Clickable "Graded"
+                    if (elm.children[5].innerText.includes("Graded") && !elm.children[5].children[0].children[0].children[0].className.includes('betterportal-graded-clickable')) {
+                        elm.children[5].children[0].children[0].children[0].classList.add('betterportal-graded-clickable');
+                    }
+
 
                     // Has Saved Notes
                     const assignmentNotes = localStorage.getItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
@@ -153,7 +157,7 @@
                 } else if (e.srcElement.className.includes("betterportal-unpin-assignment")) {
                     let assignmentElm = e.srcElement.parentElement.parentElement;
                     assignmentElm.children[6].innerHTML = assignmentElm.children[6].innerHTML.replace("betterportal-unpin-assignment", "betterportal-pin-assignment").replace("Unpin", "Pin");
-                    pinnedAssignments = pinnedAssignments.filter(x=> x.id != e.srcElement.dataset.id);
+                    pinnedAssignments = pinnedAssignments.filter(x => x.id != e.srcElement.dataset.id);
                     if (pinnedAssignments.length == 0) localStorage.removeItem("betterportal-pinned-assignments");
                     else window.localStorage.setItem("betterportal-pinned-assignments", JSON.stringify(pinnedAssignments));
                 }
