@@ -46,6 +46,12 @@
     let pageUpdate = null, events = [];
     let portalContext = null;
     let getSetting = (key) => {
+        if (!chrome.hasOwnProperty('storage')) {
+            const settings = {
+                "sortby": "none",
+            }
+            return settings[key];
+        }
         return new Promise((resolve, reject) => {
             chrome.storage.sync.get(key, (items) => {
                 resolve(items[key]);
