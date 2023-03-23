@@ -46,7 +46,9 @@
     let getSetting = (key) => {
         if (!chrome.hasOwnProperty('storage')) {
             const settings = {
-                "sortby": "none",
+                "sortby": "date_due", // none, groupname, assignment_type, short_description, date_assigned, date_due, assignment_status
+                "sortdir": "asc", // asc, des
+                
             }
             return settings[key];
         }
@@ -55,7 +57,22 @@
                 resolve(items[key]);
             });
         });
-    };
+    }; 
+    let $data = {};
+    let bpData = {
+        set(key, value) {
+            $data[key] = value;
+            localStorage.setItem(key, !['string', 'number', 'boolean'].includes(typeof value) ? JSON.stringify(value) : value);
+            return value;
+        },
+        get(key, defaultValue = null) {
+            return localStorage.getItem(key) ?? defaultValue;
+        },
+        remove(key) {
+            localStorage.removeItem(key);
+            delete $data[key];
+        }
+    }
     setInterval(async () => {
         if (lastPagePath == window.location.pathname && lastPageHash == window.location.hash) return;
         lastPagePath = window.location.pathname;
@@ -67,8 +84,8 @@
 
         if (lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
             await waitForElm("tbody#assignment-center-assignment-items>tr");
-            let hiddenAssignments = JSON.parse(window.localStorage.getItem('betterportal-hidden-assignments') ?? "[]");
-            let pinnedAssignments = JSON.parse(window.localStorage.getItem('betterportal-pinned-assignments') ?? "[]");
+            let hiddenAssignments = bpData.get("hidden-assignments", []);
+            let pinnedAssignments = bpData.get("hidden-assignments", []);
             pageUpdate = setInterval(() => {
                 const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
                 for (let elm of assignments) {
@@ -108,17 +125,16 @@
 
 
                     // Has Saved Notes
-                    const assignmentNotes = localStorage.getItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
-                    if (assignmentNotes && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                    if (bpData.get(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
                         elm.children[2].innerHTML += `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`
                     }
                 }
             }, 50);
 
             if ((await getSetting("sortby")) != "none") {
-                var clickEvent = document.createEvent("MouseEvents");
-                clickEvent.initEvent("click", true, true);
-                document.querySelector(`[data-sort="${await getSetting("sortby")}"]`).dispatchEvent(clickEvent);
+                let clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+                document.querySelector(`a[data-sort="${await getSetting("sortby")}"]`).dispatchEvent(clickEvent);
+                if ((await getSetting("sortdir")) == "des") document.querySelector(`a[data-sort="${await getSetting("sortby")}"]`).dispatchEvent(clickEvent);
             }
 
             const assignmentHeaderViewAdd = (prepend = true, html) => {
@@ -129,7 +145,7 @@
                     else assignmentHeaderView.innerHTML += html;
                 }
             };
-            if (localStorage.getItem("betterportal-hidden-assignments")) {
+            if (bpData.get("betterportal-hidden-assignments")) {
                 assignmentHeaderViewAdd(true, `<button id="betterportal-unhide-all" class="btn btn-default btn-sm" data-toggle="modal"><i class="fa fa-eye"></i> Unhide All</button>`);
             }
 
@@ -137,13 +153,13 @@
                 if (e.srcElement.className.includes("betterportal-hide-assignment")) {
                     hiddenAssignments.push(e.srcElement.dataset.id);
                     e.srcElement.parentElement.parentElement.remove();
-                    window.localStorage.setItem("betterportal-hidden-assignments", JSON.stringify(hiddenAssignments))
+                    bpData.set("betterportal-hidden-assignments", hiddenAssignments)
                     if (!document.querySelector("#betterportal-unhide-all")) {
                         assignmentHeaderViewAdd(true, `<button id="betterportal-unhide-all" class="btn btn-default btn-sm" data-toggle="modal"><i class="fa fa-eye"></i> Unhide All</button>`);
                     }
                 } else if (e.srcElement.id == "betterportal-unhide-all") {
                     hiddenAssignments = [];
-                    localStorage.removeItem("betterportal-hidden-assignments");
+                    bpData.remove("betterportal-hidden-assignments");
                     document.querySelector("#betterportal-unhide-all")?.remove();
                     window.location.reload(); // Todo, Make this not reload the page.
                 } else if (e.srcElement.className.includes("betterportal-pin-assignment")) {
@@ -153,13 +169,13 @@
                         id: e.srcElement.dataset.id,
                         link: assignmentElm.children[2].children[0].href,
                     });
-                    window.localStorage.setItem("betterportal-pinned-assignments", JSON.stringify(pinnedAssignments));
+                    bpData.set("betterportal-pinned-assignments", pinnedAssignments);
                 } else if (e.srcElement.className.includes("betterportal-unpin-assignment")) {
                     let assignmentElm = e.srcElement.parentElement.parentElement;
                     assignmentElm.children[6].innerHTML = assignmentElm.children[6].innerHTML.replace("betterportal-unpin-assignment", "betterportal-pin-assignment").replace("Unpin", "Pin");
                     pinnedAssignments = pinnedAssignments.filter(x => x.id != e.srcElement.dataset.id);
-                    if (pinnedAssignments.length == 0) localStorage.removeItem("betterportal-pinned-assignments");
-                    else window.localStorage.setItem("betterportal-pinned-assignments", JSON.stringify(pinnedAssignments));
+                    if (pinnedAssignments.length == 0) bpData.remove("betterportal-pinned-assignments");
+                    else bpData.set("betterportal-pinned-assignments", pinnedAssignments);
                 }
             }]);
             const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
@@ -175,11 +191,11 @@
   </div>
 </div>`;
             }
-            document.querySelector("#betterportal-text-content textarea").value = localStorage.getItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`) ?? "";
+            document.querySelector("#betterportal-text-content textarea").value = bpData.get(`betterportal-si-${assignmentId}_${assignmentIndexId}`, "");
             events.push(['input', (e) => {
                 if (e.srcElement.id == "betterportal-savedinfo") {
-                    if (e.srcElement.value.length == 0) localStorage.removeItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
-                    else localStorage.setItem(`betterportal-si-${assignmentId}_${assignmentIndexId}`, e.srcElement.value);
+                    if (e.srcElement.value.length == 0) bpData.remove(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
+                    else bpData.set(`betterportal-si-${assignmentId}_${assignmentIndexId}`, e.srcElement.value);
                 }
             }])
         }
