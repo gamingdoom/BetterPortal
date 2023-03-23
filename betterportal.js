@@ -8,7 +8,6 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=myschoolapp.com
 // @grant        none
 // ==/UserScript==
-const delay = ms => new Promise(res => setTimeout(res, ms));
 
 (async function () {
     'use strict';
@@ -31,6 +30,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
             });
         });
     }
+    const delay = (ms) => new Promise(res => setTimeout(res, ms));
     
     // Speed up logins
     var landingPage = "assignment-center";
