@@ -1,3 +1,13 @@
+// ==UserScript==
+// @name         Better Portal
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  Better Management!
+// @author       DanPlayz
+// @match        https://geffenacademy.myschoolapp.com/app/student
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=myschoolapp.com
+// @grant        none
+// ==/UserScript==
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 (async function () {
