@@ -2,23 +2,127 @@
 <html>
   <head>
     <title>Better Portal</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            min-width: 18em;
+            padding: 0;
+            margin: 0;
+        }
+        /* Make the table look fancy */
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+        /* Make the elements of the table look like  */
+        td {
+            text-align: center;
+            padding: 16px;
+            width: 9em;
+            background-color: #f1f1f1;
+        }
+        /* Make the rows alternate colors */
+        tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        h3 {
+            text-align: center; 
+            margin-bottom: 3px;
+            margin-top: 3px;
+        }
+
+        /* Make the checkboxes look good */
+        input[type=checkbox] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            display: inline-block;
+            position: relative;
+            width: 1.5em;
+            height: 1.5em;
+            background: #fff;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0;
+            vertical-align: middle;
+        }
+        input[type=checkbox]:checked {
+            background: #009900;
+        }
+
+        #status {
+            text-align: center;
+            margin-bottom: 3px;
+            margin-top: 3px;
+        }
+   </style>
   </head>
-  <body style="display:flex;flex-direction:column;">
-    <div style="margin-bottom: 10px">
-      <label for="sortby">Default Sort By:</label>
-      <select id="sortby">
-        <option value="none">none</option>
-        <option value="groupname">Class Name</option>
-        <option value="assignment_type">Assignment Type</option>
-        <option value="short_description">Assignment Details</option>
-        <option value="date_assigned">Assigned Date</option>
-        <option value="date_due">Due Date</option>
-        <option value="assignment_status">Status</option>
-      </select>
+  <body>
+    <div>
+        <h3>Assignment Center</h3>
+        <table id="table-assignmentcenter">
+            <tr id="ac-sortby">
+                <td data-title="name">Sort By</td>
+                <td data-title="value">
+                    <select id="sortby">
+                        <option value="none">none</option>
+                        <option value="groupname">Class Name</option>
+                        <option value="assignment_type">Assignment Type</option>
+                        <option value="short_description">Assignment Details</option>
+                        <option value="date_assigned">Assigned Date</option>
+                        <option value="date_due">Due Date</option>
+                        <option value="assignment_status">Status</option>
+                    </select>
+                </td>
+            </tr>
+            <tr id="ac-sortdir" style="display:none;">
+                <td data-title="name">Sort Direction</td>
+                <td data-title="value">
+                    <select id="sortdir">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </td>
+            </tr>
+            <tr id="ac-showbuttons">
+                <td>Show Buttons</td>
+                <td>
+                    <input type="checkbox" id="show-buttons" />
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <div id="status"></div>
-    <button id="save">Save</button>
+    <div>
+        <h3>Assignment Page</h3>
+        <table id="table-assignmentpage">
+            <tbody>
+                <tr id="ap-savednotes">
+                    <td>Saved Notes</td>
+                    <td>
+                        <input type="checkbox" id="saved-notes" />
+                    </td>
+                </tr>
+                <tr id="ap-classlinks">
+                    <td>Class Links</td>
+                    <td>
+                        <input type="checkbox" id="class-links" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <hr style="border-style:none;height: 0.3em;" />
+        <!-- <h3>A</h3> -->
+        <div id="status"></div>
+        <button id="save" style="width:100%">Save Changes</button>
+    </div>
 
     <script src="options.js"></script>
   </body>
