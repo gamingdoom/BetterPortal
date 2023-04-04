@@ -38,6 +38,7 @@
         const settings = {
             "sortby": "date_due", // none, groupname, assignment_type, short_description, date_assigned, date_due, assignment_status
             "sortdir": "asc", // asc, des
+            "showbuttons": true,
             "savednotes": true,
             "classlinks": true,
         }
