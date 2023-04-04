@@ -68,6 +68,10 @@
         get(key, defaultValue = null) {
             return (localStorage.getItem(key)?JSON.parse(localStorage.getItem(key)):null) ?? defaultValue;
         },
+        has(key) {
+            if (localStorage.getItem(key)) return true;
+            return false;
+        },
         remove(key) {
             localStorage.removeItem(key);
             delete $data[key];
@@ -125,8 +129,11 @@
 
 
                     // Has Saved Notes
-                    if (bpData.get(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
-                        elm.children[2].innerHTML += `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`
+                    let savedNotesHtml = `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`;
+                    if (bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                        elm.children[2].innerHTML += savedNotesHtml;
+                    } else if (!bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                        elm.children[2].innerHTML = elm.children[2].innerHTML.replace(savedNotesHtml, '');
                     }
                 }
             }, 50);
