@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Better Portal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Improvements to Geffen Academy Portal",
   "icons": {
     "16": "./img/icon16.png",
@@ -21,8 +21,9 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "better-portal@danplayz0",
-      "strict_min_version": "42.0"
+      "id": "better-portal@dannydivinsky",
+      "strict_min_version": "42.0",
+	  "update_url": "https://danny.divinsky.com/api/betterportal/updates.json"
     }
   },
 

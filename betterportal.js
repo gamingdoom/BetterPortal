@@ -34,21 +34,35 @@
     let lastPagePath = null, lastPageHash = null;
     let pageUpdate = null, events = [];
     let portalContext = null;
-    let getSetting = (key) => {
-        const settings = {
-            "sortby": "date_due", // none, groupname, assignment_type, short_description, date_assigned, date_due, assignment_status
-            "sortdir": "asc", // asc, des
-            "showbuttons": true,
-            "savednotes": true,
-            "classlinks": true,
+    const settings = {
+        "sortby": "date_due", // none, groupname, assignment_type, short_description, date_assigned, date_due, assignment_status
+        "sortdir": "asc", // asc, des
+        "showbuttons": true,
+        "overduecolor": null, // none, hexcode (e.g. #ff0000)
+        
+        "savednotes": true,
+        "classlinks": true,
+    }
+
+    let settingsCache = new (class SettingsCache extends Map {
+        constructor() {
+            super();
+            this.expires = new Map();
         }
-        if (!chrome.hasOwnProperty('storage')) return settings[key];
-        return new Promise((resolve) => {
-            chrome.storage.sync.get(key, (items) => {
-                resolve(items[key]);
+        get(key) {
+            const expires = this.expires;
+            if (super.has(key) && expires.get(key) > Date.now()) return super.get(key);
+            if (!chrome.hasOwnProperty('storage')) return settings[key];
+            return new Promise((resolve) => {
+                chrome.storage.sync.get(key, (items) => {
+                    super.set(key, items[key]);
+                    expires.set(key,Date.now()+1000*15);
+                    resolve(items[key]);
+                });
             });
-        });
-    };
+        }
+    })
+    let getSetting = (key) => settingsCache.get(key);
     let bpData = {
         set(key, value, json = false) {
             localStorage.setItem(key, json ? JSON.stringify(value) : value);
@@ -82,6 +96,7 @@
                 const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
                 for (let elm of assignments) {
                     if (elm.children[1].innerText == "My tasks") continue;
+                    if (elm.children[2].innerText.includes('Assessment')) continue;
                     let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
                         [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
 
@@ -92,9 +107,13 @@
                     }
 
                     // No "Overdue" Red
-                    if (elm.children[5].innerText.includes("Overdue") && !elm.children[5].children[0].children[0].children[0].className.includes('betterportal-no-danger')) {
-                        elm.children[5].children[0].children[0].children[0].classList.add('betterportal-no-danger');
-                        elm.children[5].children[0].children[0].children[0].classList.remove('label-danger');
+                    let overdueColor = await getSetting("overduecolor");
+                    if (overdueColor) {
+                        if (elm.children[5].innerText.includes("Overdue") && !elm.children[5].children[0].children[0].children[0].className.includes('betterportal-overdue')) {
+                            elm.children[5].children[0].children[0].children[0].classList.add('betterportal-overdue');
+                            elm.children[5].children[0].children[0].children[0].style = `background-color: ${overdueColor} !important;`;
+                            elm.children[5].children[0].children[0].children[0].classList.remove('label-danger');
+                        }
                     }
 
                     // Hide Assignment (Button)
@@ -131,7 +150,7 @@
                 }
             }, 50);
 
-            if (await getSetting("sortby")) {
+            if ((await getSetting("sortby")) != 'none') {
                 await waitForElm(`a[data-sort="${await getSetting("sortby")}"]`);
                 let clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
                 document.querySelector(`a[data-sort="${await getSetting("sortby")}"]`).dispatchEvent(clickEvent);
