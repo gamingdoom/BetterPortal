@@ -21,11 +21,17 @@ const saveOptions = () => {
     },
     () => {
       // Update status to let user know options were saved.
-      const status = document.getElementById('status');
-      status.textContent = 'Options saved.';
-      if (timeout) clearTimeout(timeout);
+      const settingsHr = document.querySelector("#settingsEnd hr");
+      const settingsText = document.querySelector('#settingsEnd h3');
+
+      settingsHr.style = "display: none;";
+      settingsText.style = "";
+      settingsText.textContent = 'Options saved.';
+      if(timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
-        status.textContent = '';
+        settingsHr.style = "";
+        settingsText.textContent = '';
+        settingsText.style = "display: none;";
       }, 750);
     }
   );
