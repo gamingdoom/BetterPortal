@@ -133,12 +133,6 @@ const addAssignmentDetailExtras = async ({ events, lastPagePath, lastPageHash, p
     </div>`;
             }
             document.querySelector("#betterportal-text-content textarea").value = bpData.get(`betterportal-si-${assignmentId}_${assignmentIndexId}`, "");
-            events.push(['input', (e) => {
-                if (e.srcElement.id == "betterportal-savedinfo") {
-                    if (e.srcElement.value.length == 0) bpData.remove(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
-                    else bpData.set(`betterportal-si-${assignmentId}_${assignmentIndexId}`, e.srcElement.value);
-                }
-            }])
         }
         if (await settingsCache.get("classlinks")) {
             const assignmentDetails = document.querySelector("#assignment-detail-assignment .bb-tile-content-section button");
@@ -157,6 +151,12 @@ const addAssignmentDetailExtras = async ({ events, lastPagePath, lastPageHash, p
             }
         }
     }, 500);
+    events.push(['input', (e) => {
+        if (e.srcElement.id == "betterportal-savedinfo") {
+            if (e.srcElement.value.length == 0) bpData.remove(`betterportal-si-${assignmentId}_${assignmentIndexId}`);
+            else bpData.set(`betterportal-si-${assignmentId}_${assignmentIndexId}`, e.srcElement.value);
+        }
+    }])
 }
 const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, portalContext }) => {
     await waitForElm("tbody#assignment-center-assignment-items>tr");
