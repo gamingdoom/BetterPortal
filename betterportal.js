@@ -279,6 +279,9 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
     const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
     console.log("Assignments Loaded!", assignments.length);
 }
+const quickPatches = () => {
+    document.querySelector("#group-header-Groups[href='/app/SignOut']").href = "#"
+};
 // #endregion
 
 setInterval(async () => {
@@ -289,6 +292,7 @@ setInterval(async () => {
     events.map((x) => document.body.removeEventListener(x[0], x[1]));
     events = [];
     if (portalContext == null && lastPagePath != "/app" && lastPageHash != "#login") portalContext = await fetch(`https://geffenacademy.myschoolapp.com/api/webapp/context?_=${Date.now()}`).then(res => res.json()).catch(err => { });
+    quickPatches();
 
     const ctx = { events, lastPagePath, lastPageHash, portalContext };
     if (lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
