@@ -1,5 +1,14 @@
 let timeout = null;
 
+const chromeVer = chrome.runtime.getManifest().version;
+document.querySelector("#bpversion").textContent = chromeVer;
+fetch(chrome.runtime.getManifest().browser_specific_settings.gecko.update_url.replace('updates.json', `check?version=${chromeVer}`)).then(res=>res.json()).then(json => {
+    if (!("canUpdate" in json) && !("latest_version" in json)) return;
+    if (json.canUpdate) document.querySelector("#bpheadermessage").innerHTML = `(Update Available: ${json.latest_version})`;
+    else if (json.latest_version != chromeVer) document.querySelector("#bpheadermessage").innerHTML = `(DEVELOPMENT)`;
+    else document.querySelector("#bpheadermessage").innerHTML = `(Latest Version)`;
+})
+
 const saveOptions = () => {
   const sortby = document.getElementById('sortby').value;
   const sortdir = document.getElementById('sortdir').value;
