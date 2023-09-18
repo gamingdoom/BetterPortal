@@ -166,52 +166,58 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
         const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
         let showButtons = await settingsCache.get("showbuttons"), overdueColor = await settingsCache.get("overduecolor");
         for (let elm of assignments) {
-            if (elm.children[1].innerText == "My tasks") continue;
-            if (elm.children[2].innerText.includes('Assessment')) continue;
-            let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
-                [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
-
-            // Hide Assignment (Function)
-            if (hiddenAssignments.includes(assignmentId)) {
-                elm.remove();
+            try {
+                if (elm.children[2].innerText.includes('no assignments')) continue;
+                if (elm.children[1].innerText == "My tasks") continue;
+                if (['Discussion', 'Assessment'].some((x) => elm.children[2].innerText.includes(x))) continue;
+                let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
+                    [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
+    
+                // Hide Assignment (Function)
+                if (hiddenAssignments.includes(assignmentId)) {
+                    elm.remove();
+                    continue;
+                }
+    
+                // No "Overdue" Red
+                if (overdueColor) {
+                    if (elm.children[5].innerText.includes("Overdue") && !elm.children[5].innerHTML.includes('betterportal-overdue')) {
+                        elm.children[5].children[0].children[0].children[0].classList.add('betterportal-overdue');
+                        elm.children[5].children[0].children[0].children[0].style = `background-color: ${overdueColor} !important;`;
+                        elm.children[5].children[0].children[0].children[0].classList.remove('label-danger');
+                    }
+                }
+    
+                if (showButtons) {
+                    // Hide Assignment (Button)
+                    if (!elm.children[6].innerHTML.includes("betterportal-hide-assignment")) {
+                        if (elm.children[6].innerText == "Submit") elm.children[6].innerHTML += `<br class="betterportal"/>`;
+                        elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
+                    }
+                    // Pin Assignment (Button)
+                    // if (!elm.children[6].innerHTML.includes("betterportal-pin-assignment") && !elm.children[6].innerHTML.includes("betterportal-unpin-assignment")) {
+                    //     let isPinned = pinnedAssignments.some(x => x.id == assignmentId);
+                    //     if (isPinned) elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-unpin-assignment" style="margin-left:10px;">Unpin</button>`;
+                    //     else elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-pin-assignment" style="margin-left:10px;">Pin</button>`;
+                    // }
+                }
+    
+                // Clickable "Graded"
+                if (elm.children[5].innerText.includes("Graded") && !elm.children[5].innerHTML.includes('betterportal-graded-clickable')) {
+                    elm.children[5].children[0].children[0].children[0].classList.add('betterportal-graded-clickable');
+                }
+    
+    
+                // Has Saved Notes
+                let savedNotesHtml = `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`;
+                if (bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                    elm.children[2].innerHTML += savedNotesHtml;
+                } else if (!bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                    elm.children[2].innerHTML = elm.children[2].innerHTML.replace(savedNotesHtml, '');
+                }
+            } catch (err) {
+                console.error(err);
                 continue;
-            }
-
-            // No "Overdue" Red
-            if (overdueColor) {
-                if (elm.children[5].innerText.includes("Overdue") && !elm.children[5].innerHTML.includes('betterportal-overdue')) {
-                    elm.children[5].children[0].children[0].children[0].classList.add('betterportal-overdue');
-                    elm.children[5].children[0].children[0].children[0].style = `background-color: ${overdueColor} !important;`;
-                    elm.children[5].children[0].children[0].children[0].classList.remove('label-danger');
-                }
-            }
-
-            if (showButtons) {
-                // Hide Assignment (Button)
-                if (!elm.children[6].innerHTML.includes("betterportal-hide-assignment")) {
-                    if (elm.children[6].innerText == "Submit") elm.children[6].innerHTML += `<br class="betterportal"/>`;
-                    elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
-                }
-                // Pin Assignment (Button)
-                // if (!elm.children[6].innerHTML.includes("betterportal-pin-assignment") && !elm.children[6].innerHTML.includes("betterportal-unpin-assignment")) {
-                //     let isPinned = pinnedAssignments.some(x => x.id == assignmentId);
-                //     if (isPinned) elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-unpin-assignment" style="margin-left:10px;">Unpin</button>`;
-                //     else elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-pin-assignment" style="margin-left:10px;">Pin</button>`;
-                // }
-            }
-
-            // Clickable "Graded"
-            if (elm.children[5].innerText.includes("Graded") && !elm.children[5].innerHTML.includes('betterportal-graded-clickable')) {
-                elm.children[5].children[0].children[0].children[0].classList.add('betterportal-graded-clickable');
-            }
-
-
-            // Has Saved Notes
-            let savedNotesHtml = `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`;
-            if (bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
-                elm.children[2].innerHTML += savedNotesHtml;
-            } else if (!bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && elm.children[2].innerHTML.includes('betterportal-savednotes')) {
-                elm.children[2].innerHTML = elm.children[2].innerHTML.replace(savedNotesHtml, '');
             }
         }
     }, 50);
@@ -272,15 +278,15 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
             e.srcElement.innerHTML = e.srcElement.innerHTML.replace("betterportal-graded-clickable", "betterportal-graded-clicked");
             let stringGrade = `${assignmentDetails.pointsEarned}/${assignmentDetails.maxPoints} (${assignmentDetails.pointsEarned / assignmentDetails.maxPoints.toFixed(2)}%)`;
             e.srcElement.parentElement.innerHTML += `<br /><span class="label label-success primary-status betterportal-grade-show">${stringGrade}</span>`;
-        } else {
-            console.log(e.srcElement);
+        } else if (e.srcElement.id == "missing-assignment") {
+            console.log(e.srcElement.dataset, e.srcElement.dataset['data-toggle'] == "modal")
+            
         }
     }]);
-    const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
-    console.log("Assignments Loaded!", assignments.length);
 }
 const quickPatches = () => {
-    document.querySelector("#group-header-Groups[href='/app/SignOut']").href = "#"
+    if (document.querySelector("#group-header-Groups[href='/app/SignOut']")) 
+        document.querySelector("#group-header-Groups[href='/app/SignOut']").href = "#";
 };
 // #endregion
 
@@ -306,7 +312,6 @@ setInterval(async () => {
             }
         }]);
     }
-    console.log(events);
     events.map((x) => document.body.addEventListener(x[0], x[1]));
 }, 25);
 
