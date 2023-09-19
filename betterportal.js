@@ -61,6 +61,9 @@ const defaultSettings = {
     "savednotes": true,
     "classlinks": true,
     "resize_submissions": true,
+
+    "cloudsync": true,
+    "disable_extension": false,
 };
 class ChromeMap extends CacheMap {
     constructor() {
@@ -177,6 +180,7 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
     let hiddenAssignments = bpData.get("betterportal-hidden-assignments", [], true);
     let pinnedAssignments = bpData.get("betterportal-pinned-assignments", [], true);
     pageUpdate = setInterval(async () => {
+        if (document.querySelector("tbody#assignment-center-assignment-items").children.length == 0) return;
         const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
         let showButtons = await settingsCache.get("showbuttons"), overdueColor = await settingsCache.get("overduecolor");
         for (let elm of assignments) {
@@ -290,7 +294,7 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
             const assignmentDetails = data.find(x => x);
 
             e.srcElement.innerHTML = e.srcElement.innerHTML.replace("betterportal-graded-clickable", "betterportal-graded-clicked");
-            let stringGrade = `${assignmentDetails.pointsEarned}/${assignmentDetails.maxPoints} (${assignmentDetails.pointsEarned / assignmentDetails.maxPoints.toFixed(2)}%)`;
+            let stringGrade = `${assignmentDetails.pointsEarned}/${assignmentDetails.maxPoints} (${((assignmentDetails.pointsEarned / assignmentDetails.maxPoints)*100).toFixed(2)}%)`;
             e.srcElement.parentElement.innerHTML += `<br /><span class="label label-success primary-status betterportal-grade-show">${stringGrade}</span>`;
         } else if (e.srcElement.id == "missing-assignment") {
             console.log(e.srcElement.dataset, e.srcElement.dataset['data-toggle'] == "modal")
@@ -305,6 +309,8 @@ const quickPatches = () => {
 // #endregion
 
 setInterval(async () => {
+    let disabled = await settingsCache.get("disable_extension");
+    if (disabled) return;
     if (lastPagePath == window.location.pathname && lastPageHash == window.location.hash) return;
     lastPagePath = window.location.pathname;
     lastPageHash = window.location.hash;
