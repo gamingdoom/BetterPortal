@@ -70,6 +70,20 @@
             margin-top: 0px;
             background-color: #ddd;
         }
+
+        #bpversion {
+            cursor: pointer;
+            /* If you want to implement it in very old browser-versions */
+            -webkit-user-select: none; /* Chrome/Safari */ 
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+
+            /* The rule below is not implemented in browsers yet */
+            -o-user-select: none;
+
+            /* The rule below is implemented in most browsers by now */
+            user-select: none;
+        }
    </style>
   </head>
   <body>
@@ -138,6 +152,26 @@
                     <td>Class Links</td>
                     <td>
                         <input type="checkbox" id="class-links" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="system" style="display: none;">
+        <h3>System</h3>
+        <table id="table-assignmentpage">
+            <tbody>
+                <tr id="sys-cloudsync">
+                    <td>Cloud Sync</td>
+                    <td>
+                        <input type="checkbox" id="cloud-sync" />
+                    </td>
+                </tr>
+                <tr id="sys-disableextension">
+                    <td>Disable Extension</td>
+                    <td>
+                        <input type="checkbox" id="disable-extension" />
                     </td>
                 </tr>
             </tbody>

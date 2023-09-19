@@ -18,6 +18,9 @@ const saveOptions = () => {
   const savednotes = document.getElementById('saved-notes').checked;
   const classlinks = document.getElementById('class-links').checked;
 
+  const cloudsync = document.getElementById('cloud-sync').checked;
+  const disable_extension = document.getElementById('disable-extension').checked;
+
   chrome.storage.sync.set(
     {
         sortby: sortby,
@@ -27,6 +30,8 @@ const saveOptions = () => {
 
         savednotes: savednotes,
         classlinks: classlinks,
+        cloudsync: cloudsync,
+        disable_extension: disable_extension
     },
     () => {
       // Update status to let user know options were saved.
@@ -49,7 +54,7 @@ const saveOptions = () => {
 // Restores select box and checkbox state using the preferences
 const restoreOptions = () => {
   chrome.storage.sync.get(
-    { sortby: 'none', sortdir: 'asc', savednotes: true, classlinks: true, showbuttons: true, overduecolor: null },
+    { sortby: 'none', sortdir: 'asc', savednotes: true, classlinks: true, showbuttons: true, overduecolor: null, cloudsync: true, disable_extension: false, },
     (items) => {
         // Assignement Center
         document.getElementById('sortby').value = items.sortby;
@@ -67,6 +72,10 @@ const restoreOptions = () => {
         // Assignement Page
         document.getElementById('saved-notes').checked = items.savednotes;
         document.getElementById('class-links').checked = items.classlinks;
+
+        // System
+        document.getElementById('cloud-sync').checked = items.cloudsync;
+        document.getElementById('disable-extension').checked = items.disable_extension;
     }
   );
 };
@@ -94,4 +103,11 @@ document.getElementById('overduecolor').addEventListener('change', () => {
 document.querySelectorAll("input[type='checkbox']").forEach((el) => {
     el.addEventListener("click", (e) => e.stopPropagation());
     el.parentElement.addEventListener("click", (e) => el.checked = !el.checked);
+});
+
+let showingSystemOptions = false;
+document.querySelector("#bpversion").addEventListener("click", (e) => {
+    e.stopPropagation();
+    showingSystemOptions = !showingSystemOptions;
+    document.querySelector("#system").style.display = showingSystemOptions ? "" : "none";
 });
