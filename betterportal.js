@@ -180,7 +180,7 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
     let hiddenAssignments = bpData.get("betterportal-hidden-assignments", [], true);
     let pinnedAssignments = bpData.get("betterportal-pinned-assignments", [], true);
     pageUpdate = setInterval(async () => {
-        if (document.querySelector("tbody#assignment-center-assignment-items").children.length == 0) return;
+        if (document.querySelector("tbody#assignment-center-assignment-items") == null) return;
         const assignments = [...document.querySelector("tbody#assignment-center-assignment-items").children];
         let showButtons = await settingsCache.get("showbuttons"), overdueColor = await settingsCache.get("overduecolor");
         for (let elm of assignments) {
