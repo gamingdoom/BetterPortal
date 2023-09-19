@@ -60,6 +60,7 @@ const defaultSettings = {
 
     "savednotes": true,
     "classlinks": true,
+    "resize_submissions": true,
 };
 class ChromeMap extends CacheMap {
     constructor() {
@@ -121,6 +122,7 @@ const bpData = {
 const addAssignmentDetailExtras = async ({ events, lastPagePath, lastPageHash, portalContext }) => {
     await waitForElm("div#assignment-detail-assignment .bb-tile-content-section");
     const [_, assignmentId, assignmentIndexId] = lastPageHash.match(/#assignmentdetail\/(\d+)\/(\d+)/);
+    let resizedSubmission = false;
     pageUpdate = setInterval(async () => {
 
         if (await settingsCache.get("savednotes")) {
@@ -150,6 +152,18 @@ const addAssignmentDetailExtras = async ({ events, lastPagePath, lastPageHash, p
     </div>`;
             }
         }
+
+        if (await settingsCache.get("resize_submissions")) {
+            if (document.querySelector(".online-submission-text-container > div[role='application']") && document.querySelector("#assignment-detail-assignment .bb-tile-content-section")) {
+                let heightDifference = document.querySelector("#assignment-detail-assignment .bb-tile-content-section").scrollHeight - document.querySelector("#assignment-detail-extras").scrollHeight;
+                if (heightDifference < 0) heightDifference = 0;
+                if (heightDifference != 0 && !resizedSubmission) {
+                    resizedSubmission = true;
+                    document.querySelector(".online-submission-text-container > div[role='application']").style.height = heightDifference+200+"px";
+                }
+            }
+        }
+
     }, 500);
     events.push(['input', (e) => {
         if (e.srcElement.id == "betterportal-savedinfo") {
