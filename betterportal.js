@@ -188,8 +188,14 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
                 if (elm.children[2].innerText.includes('no assignments')) continue;
                 if (elm.children[1].innerText == "My tasks") continue;
                 if (['Discussion', 'Assessment'].some((x) => elm.children[2].innerText.includes(x))) continue;
-                let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id,
+                let assignmentId = elm.children[5].children[0].children[0].children[0].dataset.id;
+                let assignmentIndexId = null;
+                try {
                     [_, assignmentIndexId] = elm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
+                } catch {}
+                if (!assignmentIndexId) try {
+                    assignmentIndexId = elm.children[6].children[0].dataset.index;
+                } catch {}
     
                 // Hide Assignment (Function)
                 if (hiddenAssignments.includes(assignmentId)) {
@@ -210,13 +216,13 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
                     // Hide Assignment (Button)
                     if (!elm.children[6].innerHTML.includes("betterportal-hide-assignment")) {
                         if (elm.children[6].innerText == "Submit") elm.children[6].innerHTML += `<br class="betterportal"/>`;
-                        elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
+                        elm.children[6].innerHTML += `<button data-id="${assignmentId}"${assignmentIndexId ? ` data-index="${assignmentIndexId}"`: ""} class="btn btn-link betterportal-hide-assignment" style="padding-left:0px;">Hide</button>`;
                     }
                     // Pin Assignment (Button)
                     // if (!elm.children[6].innerHTML.includes("betterportal-pin-assignment") && !elm.children[6].innerHTML.includes("betterportal-unpin-assignment")) {
                     //     let isPinned = pinnedAssignments.some(x => x.id == assignmentId);
-                    //     if (isPinned) elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-unpin-assignment" style="margin-left:10px;">Unpin</button>`;
-                    //     else elm.children[6].innerHTML += `<button data-id="${assignmentId}" class="btn btn-link betterportal-pin-assignment" style="margin-left:10px;">Pin</button>`;
+                    //     if (isPinned) elm.children[6].innerHTML += `<button data-id="${assignmentId}"${assignmentIndexId ? ` data-index="${assignmentIndexId}"`: ""} class="btn btn-link betterportal-unpin-assignment" style="margin-left:10px;">Unpin</button>`;
+                    //     else elm.children[6].innerHTML += `<button data-id="${assignmentId}"${assignmentIndexId ? ` data-index="${assignmentIndexId}"`: ""} class="btn btn-link betterportal-pin-assignment" style="margin-left:10px;">Pin</button>`;
                     // }
                 }
     
@@ -227,11 +233,13 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
     
     
                 // Has Saved Notes
-                let savedNotesHtml = `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`;
-                if (bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
-                    elm.children[2].innerHTML += savedNotesHtml;
-                } else if (!bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && elm.children[2].innerHTML.includes('betterportal-savednotes')) {
-                    elm.children[2].innerHTML = elm.children[2].innerHTML.replace(savedNotesHtml, '');
+                if (!assignmentIndexId) {
+                    let savedNotesHtml = `<p class="betterportal-savednotes" style="margin:-2px 0px 0px 0px; font-size:11px; color:#700">Has Saved Notes</p>`;
+                    if (bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && !elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                        elm.children[2].innerHTML += savedNotesHtml;
+                    } else if (!bpData.has(`betterportal-si-${assignmentId}_${assignmentIndexId}`) && elm.children[2].innerHTML.includes('betterportal-savednotes')) {
+                        elm.children[2].innerHTML = elm.children[2].innerHTML.replace(savedNotesHtml, '');
+                    }
                 }
             } catch (err) {
                 console.error(err);
@@ -289,7 +297,13 @@ const addAssignmentCenterExtras = async ({ events, lastPagePath, lastPageHash, p
         } else if (e.srcElement.className.includes("betterportal-graded-clickable")) {
             // let assignmentElm = e.srcElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentEl
             let assignmentElm = e.srcElement.parentElement.parentElement.parentElement.parentElement;
-            let [_, assignmentIndexId] = assignmentElm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
+            let assignmentIndexId = null;
+            try {
+                [_, assignmentIndexId] = assignmentElm.children[2].children[0].href.replace(/^.+#/, '#').match(/#assignmentdetail\/\d+\/(\d+)/);
+            } catch {}
+            if (!assignmentIndexId) try {
+                assignmentIndexId = assignmentElm.children[6].children[0].dataset.index;
+            } catch {}
             const data = await fetch(`https://geffenacademy.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${portalContext.MasterUserInfo.UserId}&AssignmentIndexId=${assignmentIndexId}`, { "method": "GET", "mode": "cors", "credentials": "include" }).then((res) => res.json());
             const assignmentDetails = data.find(x => x);
 
