@@ -22,8 +22,8 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "better-portal@dannydivinsky",
-      "strict_min_version": "42.0",
-	  "update_url": "https://danny.divinsky.com/api/betterportal/updates.json"
+      "strict_min_version": "58.0",
+      "update_url": "https://danny.divinsky.com/api/betterportal/updates.json"
     }
   },
 
