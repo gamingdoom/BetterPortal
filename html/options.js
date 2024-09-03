@@ -10,6 +10,7 @@ fetch(chrome.runtime.getManifest().browser_specific_settings.gecko.update_url.re
 })
 
 const saveOptions = () => {
+  const oldac = document.getElementById('old_assignment_center').checked;
   const sortby = document.getElementById('sortby').value;
   const sortdir = document.getElementById('sortdir').value;
   const overduecolor = document.getElementById('overduecolor').value == 'none' ? null : document.getElementById('overduecolor-custom').value;
@@ -24,6 +25,7 @@ const saveOptions = () => {
 
   chrome.storage.sync.set(
     {
+        old_assignments: oldac,
         sortby: sortby,
         sortdir: sortdir,
         showbuttons: showbuttons,
@@ -57,9 +59,11 @@ const saveOptions = () => {
 // Restores select box and checkbox state using the preferences
 const restoreOptions = () => {
   chrome.storage.sync.get(
-    { sortby: 'none', sortdir: 'asc', savednotes: true, classlinks: true, showbuttons: true, overduecolor: null, cloudsync: true, disable_extension: false, resize_submissions: true },
+    { old_assignments: true, sortby: 'none', sortdir: 'asc', savednotes: true, classlinks: true, showbuttons: true, overduecolor: null, cloudsync: true, disable_extension: false, resize_submissions: true },
     (items) => {
         // Assignement Center
+        document.getElementById('old_assignment_center').checked = items.old_assignments;
+
         document.getElementById('sortby').value = items.sortby;
         if(items.sortby != 'none') document.getElementById('ac-sortdir').style = '';
 

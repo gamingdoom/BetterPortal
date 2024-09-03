@@ -72,6 +72,7 @@ class CacheMap {
 }
 
 const defaultSettings = {
+    "old_assignments": true,
     "sortby": "none", // none, groupname, assignment_type, short_description, date_assigned, date_due, assignment_status
     "sortdir": "asc", // asc, des
     "showbuttons": true,
@@ -364,7 +365,11 @@ setInterval(async () => {
     events = [];
     if (portalContext == null && lastPagePath != "/app" && lastPageHash != "#login") portalContext = await fetch(`https://geffenacademy.myschoolapp.com/api/webapp/context?_=${Date.now()}`).then(res => res.json()).catch(err => { });
     quickPatches();
-    oldAssignments();
+
+    let oldac = await settingsCache.get("old_assignments");
+    if (oldac) {
+        oldAssignments();
+    }
 
     const ctx = { events, lastPagePath, lastPageHash, portalContext };
     if (lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
