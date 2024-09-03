@@ -17,6 +17,25 @@ function waitForElm(selector) {
         });
     });
 }
+function waitForElmByID(id) {
+    return new Promise(resolve => {
+        if (document.getElementById(id)) {
+            return resolve(document.getElementById(id));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.getElementById(id)) {
+                resolve(document.getElementById(id));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
 class CacheMap {
     constructor() {
         this.cache = new Map();
@@ -57,7 +76,7 @@ const defaultSettings = {
     "sortdir": "asc", // asc, des
     "showbuttons": true,
     "overduecolor": null, // none, hexcode (e.g. #ff0000)
-
+    
     "savednotes": true,
     "classlinks": true,
     "resize_submissions": true,
@@ -320,6 +339,18 @@ const quickPatches = () => {
     if (document.querySelector("#group-header-Groups[href='/app/SignOut']")) 
         document.querySelector("#group-header-Groups[href='/app/SignOut']").href = "#";
 };
+
+const oldAssignments = async () => {
+    await waitForElmByID("assignment-center-btn");
+    var assignment_center_btn = document.getElementById("assignment-center-btn");
+    assignment_center_btn.href = "/app/student#studentmyday/assignment-center";
+    
+    var to_replace = document.querySelectorAll('[href*="/lms-assignment/assignment-center/student/"]')
+    for (var i = 0; i < to_replace.length; i++){
+        to_replace[i].href = "/app/student#studentmyday/assignment-center";
+    }
+}
+
 // #endregion
 
 setInterval(async () => {
@@ -333,6 +364,7 @@ setInterval(async () => {
     events = [];
     if (portalContext == null && lastPagePath != "/app" && lastPageHash != "#login") portalContext = await fetch(`https://geffenacademy.myschoolapp.com/api/webapp/context?_=${Date.now()}`).then(res => res.json()).catch(err => { });
     quickPatches();
+    oldAssignments();
 
     const ctx = { events, lastPagePath, lastPageHash, portalContext };
     if (lastPagePath == "/app/student" && lastPageHash == "#studentmyday/assignment-center") {
