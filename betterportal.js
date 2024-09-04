@@ -342,9 +342,8 @@ const quickPatches = () => {
 };
 
 const oldAssignments = async () => {
-    await waitForElmByID("assignment-center-btn");
-    var assignment_center_btn = document.getElementById("assignment-center-btn");
-    assignment_center_btn.href = "/app/student#studentmyday/assignment-center";
+    // Waits until page is loaded enough.
+    await waitForElmByID("site-nav-lower");
     
     var to_replace = document.querySelectorAll('[href*="/lms-assignment/assignment-center/student/"]')
     for (var i = 0; i < to_replace.length; i++){
